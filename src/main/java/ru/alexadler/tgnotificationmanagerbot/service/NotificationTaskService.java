@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.alexadler.tgnotificationmanagerbot.model.NotificationTask;
 import ru.alexadler.tgnotificationmanagerbot.repository.NotificationTaskRepository;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
@@ -24,9 +25,20 @@ public class NotificationTaskService {
     }
 
     /**
+     * Get all user tasks.
+     * @param userId User id.
+     * @return collection of user tasks.
+     */
+    public Collection<NotificationTask> getAllUserNotificationTasks(long userId) {
+        Collection<NotificationTask> allUserNotificationTasks = notificationTaskRepository.findAllByUserId(userId);
+        LOGGER.debug("All user notification tasks: {}", allUserNotificationTasks);
+        return allUserNotificationTasks;
+    }
+
+    /**
      * Add a new task to the database.
-     * @param notificationTask new notification task to add.
-     * @return added notification task.
+     * @param notificationTask new task to add.
+     * @return added task.
      */
     public NotificationTask addNotificationTask(NotificationTask notificationTask) {
         NotificationTask newNotificationTask = notificationTaskRepository.save(notificationTask);
@@ -58,11 +70,42 @@ public class NotificationTaskService {
     }
 
     /**
+     * Remove old tasks whose date/time is less than the current date/time up to a minute.
+     */
+    @Transactional
+    public void deleteOldNotificationTasks() {
+        final LocalDateTime dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        int removedNumber = notificationTaskRepository.deleteAllByDateTimeBefore(dateTime);
+        LOGGER.debug("{} old notification tasks removed", removedNumber);
+    }
+
+    /**
      * Remove a task from the database.
-     * @param notificationTask notification task to remove.
+     * @param notificationTask task to remove.
      */
     public void deleteNotificationTask(NotificationTask notificationTask) {
         notificationTaskRepository.delete(notificationTask);
-        LOGGER.debug("Notification task deleted: {}", notificationTask);
+        LOGGER.debug("Notification task removed: {}", notificationTask);
+    }
+
+    /**
+     * Remove all user tasks from the database.
+     * @param userId User id.
+     */
+    @Transactional
+    public void deleteAllUserNotificationTasks(long userId) {
+        int removedNumber = notificationTaskRepository.deleteAllByUserId(userId);
+        LOGGER.debug("{} notification tasks removed for user {}", removedNumber, userId);
+    }
+
+    /**
+     * Remove user task from the database.
+     * @param userId User id.
+     * @param notificationTaskId Task id.
+     */
+    @Transactional
+    public void deleteUserNotificationTask(long userId, long notificationTaskId) {
+        int removedNumber = notificationTaskRepository.deleteAllByUserIdAndId(userId, notificationTaskId);
+        LOGGER.debug("{} notification tasks removed for user {}", removedNumber, userId);
     }
 }

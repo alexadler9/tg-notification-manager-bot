@@ -31,15 +31,36 @@ class TgNotificationManagerBotUpdatesListenerTest {
         Assertions.assertEquals(UserMessage.USER_MESSAGE_START, out.parseUserMessage("/start"));
     }
 
-    @ParameterizedTest
-    @MethodSource("provideParamsForCheckInvalidUserMessage")
-    public void shouldReturnUndefinedMessage(String message) {
-        Assertions.assertEquals(UserMessage.USER_MESSAGE_UNDEFINED, out.parseUserMessage(message));
+    @Test
+    public void shouldReturnNotificationsGetMessage() {
+        Assertions.assertEquals(UserMessage.USER_MESSAGE_NOTIFICATIONS_GET, out.parseUserMessage("/get"));
     }
 
     @Test
-    public void shouldReturnNotificationMessage() {
-        Assertions.assertEquals(UserMessage.USER_MESSAGE_NOTIFICATION, out.parseUserMessage("01.01.2022 12:00 сделать домашнее задание"));
+    public void shouldReturnNotificationCreateMessage() {
+        Assertions.assertEquals(UserMessage.USER_MESSAGE_NOTIFICATION_CREATE, out.parseUserMessage("01.01.2022 12:00 сделать домашнее задание"));
+    }
+
+    @Test
+    public void shouldReturnNotificationsDeleteMessage() {
+        Assertions.assertEquals(UserMessage.USER_MESSAGE_NOTIFICATIONS_DELETE, out.parseUserMessage("/delete"));
+    }
+
+    @Test
+    public void shouldReturnNotificationDeleteMessage() {
+        Assertions.assertEquals(UserMessage.USER_MESSAGE_NOTIFICATION_DELETE, out.parseUserMessage("/delete 20"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParamsForCheckUndefinedUserCommand")
+    public void shouldReturnUndefinedCommand(String message) {
+        Assertions.assertEquals(UserMessage.USER_MESSAGE_UNDEFINED_COMMAND, out.parseUserMessage(message));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideParamsForCheckUndefinedUserMessage")
+    public void shouldReturnUndefinedMessage(String message) {
+        Assertions.assertEquals(UserMessage.USER_MESSAGE_UNDEFINED, out.parseUserMessage(message));
     }
 
     @ParameterizedTest
@@ -54,7 +75,16 @@ class TgNotificationManagerBotUpdatesListenerTest {
         Assertions.assertNotNull(out.parseUserMessageDateTime(dateTime));
     }
 
-    private static Stream<Arguments> provideParamsForCheckInvalidUserMessage() {
+    private static Stream<Arguments> provideParamsForCheckUndefinedUserCommand() {
+        return Stream.of(
+                Arguments.of("/"),                  //Command is empty
+                Arguments.of("/add"),               //Unknown command
+                Arguments.of("/delete 20 task"),    //Extra parameter in the delete command
+                Arguments.of("/delete task 20")     //Extra parameter in the delete command
+        );
+    }
+
+    private static Stream<Arguments> provideParamsForCheckUndefinedUserMessage() {
         return Stream.of(
                 Arguments.of(""),                   //User message is empty
                 Arguments.of("Invalid message"),    //Invalid format message

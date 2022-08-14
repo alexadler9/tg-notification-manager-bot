@@ -76,7 +76,7 @@ public class NotificationTask {
 
     @Override
     public String toString() {
-        return "Notification " + id + ". " +
+        return id + ". " +
                 "[" + userId + ", " + dateTime + "] : " +
                 message;
     }
