@@ -38,3 +38,4 @@ out/
 
 ### Secret application properties ###
 /src/main/resources/application-token.properties
+/src/main/resources/application-db.properties
