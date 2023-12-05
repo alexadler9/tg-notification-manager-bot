@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import ru.alexadler9.tgnotificationmanagerbot.model.User;
 import ru.alexadler9.tgnotificationmanagerbot.repository.UserRepository;
 
+import java.util.Optional;
+
 /**
  * Service for managing users.
  */
@@ -24,10 +26,10 @@ public class UserService {
      * Returns user by the specified ID.
      *
      * @param id user ID (ID chat).
-     * @return user, or null if there is no such user.
+     * @return user with the given id or {@literal Optional#empty()} if none found.
      */
-    public User getUser(Long id) {
-        return userRepository.findById(id).orElse(null);
+    public Optional<User> getUser(Long id) {
+        return userRepository.findById(id);
     }
 
     /**
