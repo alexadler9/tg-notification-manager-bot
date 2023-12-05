@@ -3,11 +3,13 @@ package ru.alexadler9.tgnotificationmanagerbot.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.alexadler9.tgnotificationmanagerbot.model.Notification;
 import ru.alexadler9.tgnotificationmanagerbot.model.User;
 import ru.alexadler9.tgnotificationmanagerbot.repository.NotificationRepository;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 
 /**
@@ -54,5 +56,37 @@ public class NotificationService {
      */
     public Notification addNotification(User user, LocalDateTime dateTime, String message) {
         return addNotification(new Notification(null, user, dateTime, message));
+    }
+
+    /**
+     * Get notifications whose date/time corresponds to the current date/time up to a minute.
+     * @return collection of actual notifications.
+     */
+    public Collection<Notification> getActualNotifications() {
+        final LocalDateTime dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        Collection<Notification> notifications = notificationRepository.findAllByDateTime(dateTime);
+        if (!notifications.isEmpty()) {
+            LOGGER.debug("Actual notifications: {}", notifications);
+        }
+        return notifications;
+    }
+
+    /**
+     * Remove old notifications whose date/time is less than the current date/time up to a minute.
+     */
+    @Transactional
+    public void deleteOldNotifications() {
+        final LocalDateTime dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        int removedNumber = notificationRepository.deleteAllByDateTimeBefore(dateTime);
+        LOGGER.debug("{} old notifications removed", removedNumber);
+    }
+
+    /**
+     * Remove a notification from the database.
+     * @param notification notification to remove.
+     */
+    public void deleteNotification(Notification notification) {
+        notificationRepository.delete(notification);
+        LOGGER.debug("Notification removed: {}", notification);
     }
 }

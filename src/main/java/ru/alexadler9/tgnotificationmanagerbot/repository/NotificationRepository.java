@@ -1,6 +1,8 @@
 package ru.alexadler9.tgnotificationmanagerbot.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import ru.alexadler9.tgnotificationmanagerbot.model.Notification;
 import ru.alexadler9.tgnotificationmanagerbot.model.User;
@@ -14,4 +16,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     Collection<Notification> findAllByDateTime(LocalDateTime dateTime);
 
     Collection<Notification> findAllByUser(User user);
+
+    @Modifying
+    @Query(value = "DELETE FROM notifications WHERE date_time < :dateTime", nativeQuery = true)
+    int deleteAllByDateTimeBefore(LocalDateTime dateTime);
 }

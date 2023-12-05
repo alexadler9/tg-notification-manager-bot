@@ -10,9 +10,11 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import ru.alexadler9.tgnotificationmanagerbot.api.BotKeyboard;
 import ru.alexadler9.tgnotificationmanagerbot.api.UserMessageID;
+import ru.alexadler9.tgnotificationmanagerbot.model.Notification;
 import ru.alexadler9.tgnotificationmanagerbot.model.User;
 import ru.alexadler9.tgnotificationmanagerbot.service.NotificationService;
 import ru.alexadler9.tgnotificationmanagerbot.service.UserService;
@@ -150,8 +152,8 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
     }
 
     /**
-     * The function parses a task date/time string.
-     * @param dateTime task date/time string.
+     * The function parses a notification date/time string.
+     * @param dateTime notification date/time string.
      * @return LocalDateTime in case of successful parsing. Otherwise, returns null.
      */
     @Nullable
@@ -166,5 +168,35 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
         } catch (DateTimeParseException e) {
             return null;
         }
+    }
+
+    /**
+     * The function converts content of the notification into a readable message.
+     * @param notification notification.
+     * @return Message.
+     */
+    private String convertNotificationToBotMessage(Notification notification) {
+        return "[" + notification.getId() + "] " +
+                notification.getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) + " " +
+                notification.getMessage();
+    }
+
+    /**
+     * The function every minute checks actual tasks and sends to users notifications about them.
+     */
+    @Scheduled(cron = "0 0/1 * * * *")
+    public void checkActualNotifications() {
+        notificationService.getActualNotifications().forEach(notification -> {
+            sendBotMessage(notification.getUser().getId(), "Напоминание: " + notification.getMessage());
+            notificationService.deleteNotification(notification);
+        });
+    }
+
+    /**
+     * The function every day deletes old notifications.
+     */
+    @Scheduled(cron = "@daily")
+    public void deleteOldNotifications() {
+        notificationService.deleteOldNotifications();
     }
 }
