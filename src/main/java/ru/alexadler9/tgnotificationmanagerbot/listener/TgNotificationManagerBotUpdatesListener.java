@@ -81,6 +81,15 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
                     sendBotMessage(userId, BOT_MESSAGE_START);
                 }
 
+                case USER_MESSAGE_NOTIFICATIONS_GET_REQUEST -> {
+                    LOGGER.debug("Processing request to get notifications");
+                    StringBuilder sbMessage = new StringBuilder();
+                    notificationService.getAllUserNotifications(user).forEach(notification -> {
+                        sbMessage.append(convertNotificationToBotMessage(notification)).append("\n");
+                    });
+                    sendBotMessage(userId, sbMessage.isEmpty() ? BOT_MESSAGE_NOTIFICATIONS_LIST_EMPTY : sbMessage.toString());
+                }
+
                 case USER_MESSAGE_NOTIFICATION_ADD_REQUEST -> {
                     LOGGER.debug("Processing request to add a notification");
                     sendBotMessage(userId, BOT_MESSAGE_NOTIFICATION_ADD_INSTRUCTIONS);
@@ -140,6 +149,10 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
             return USER_MESSAGE_START;
         }
 
+        if (currMessage.equals(KB_NOTIFICATIONS_GET)) {
+            return USER_MESSAGE_NOTIFICATIONS_GET_REQUEST;
+        }
+
         if (currMessage.equals(KB_NOTIFICATION_ADD)) {
             return USER_MESSAGE_NOTIFICATION_ADD_REQUEST;
         }
@@ -176,7 +189,7 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
      * @return Message.
      */
     private String convertNotificationToBotMessage(Notification notification) {
-        return "[" + notification.getId() + "] " +
+        return "<" + notification.getId() + "> " +
                 notification.getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) + " " +
                 notification.getMessage();
     }

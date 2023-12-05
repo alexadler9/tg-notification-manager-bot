@@ -14,6 +14,9 @@ public class BotKeyboard {
 
         public static final String KB_NOTIFICATION_ADD =
                 "ДОБАВИТЬ НАПОМИНАНИЕ";
+
+        public static final String KB_NOTIFICATIONS_GET =
+                "СПИСОК НАПОМИНАНИЙ";
     }
 
     /**
@@ -22,7 +25,11 @@ public class BotKeyboard {
      * @return created keyboard object.
      */
     public Keyboard getMainKeyboardMarkup() {
-        return new ReplyKeyboardMarkup(Button.KB_NOTIFICATION_ADD)
+        return new ReplyKeyboardMarkup
+                (
+                    new String[] { Button.KB_NOTIFICATION_ADD },
+                    new String[] { Button.KB_NOTIFICATIONS_GET }
+                )
                 .oneTimeKeyboard(false)
                 .resizeKeyboard(true)
                 .selective(true);

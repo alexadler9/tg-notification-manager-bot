@@ -43,6 +43,11 @@ class TgNotificationManagerBotUpdatesListenerTest {
     }
 
     @Test
+    public void shouldReturnNotificationsGetMessage() {
+        Assertions.assertEquals(USER_MESSAGE_NOTIFICATIONS_GET_REQUEST, out.parseUserMessage(KB_NOTIFICATIONS_GET, ""));
+    }
+
+    @Test
     public void shouldReturnNotificationAddRequestMessage() {
         Assertions.assertEquals(USER_MESSAGE_NOTIFICATION_ADD_REQUEST, out.parseUserMessage(KB_NOTIFICATION_ADD, ""));
     }
