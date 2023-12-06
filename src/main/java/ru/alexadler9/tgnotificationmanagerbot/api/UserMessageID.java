@@ -13,5 +13,11 @@ public enum UserMessageID {
     /** The user requested to add a notification */
     USER_MESSAGE_NOTIFICATION_ADD_REQUEST,
     /** The user adds a notification */
-    USER_MESSAGE_NOTIFICATION_ADD
+    USER_MESSAGE_NOTIFICATION_ADD,
+    /** The user requested to delete a notification by ID */
+    USER_MESSAGE_NOTIFICATION_DELETE_BY_ID_REQUEST,
+    /** The user specified a notification ID to delete */
+    USER_MESSAGE_NOTIFICATION_DELETE_BY_ID,
+    /** The user requested to delete all notifications */
+    USER_MESSAGE_NOTIFICATIONS_DELETE_ALL_REQUEST
 }

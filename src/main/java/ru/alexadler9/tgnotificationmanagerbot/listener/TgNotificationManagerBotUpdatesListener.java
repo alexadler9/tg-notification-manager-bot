@@ -7,6 +7,7 @@ import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.NonNull;
@@ -85,7 +86,7 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
                     LOGGER.debug("Processing request to get notifications");
                     StringBuilder sbMessage = new StringBuilder();
                     notificationService.getAllUserNotifications(user).forEach(notification -> {
-                        sbMessage.append(convertNotificationToBotMessage(notification)).append("\n");
+                        sbMessage.append("• ").append(convertNotificationToBotMessage(notification)).append("\n");
                     });
                     sendBotMessage(userId, sbMessage.isEmpty() ? BOT_MESSAGE_NOTIFICATIONS_LIST_EMPTY : sbMessage.toString());
                 }
@@ -112,6 +113,29 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
                         LOGGER.warn("Wrong message format");
                         sendBotMessage(userId, BOT_MESSAGE_NOTIFICATION_WRONG_FORMAT);
                     }
+                }
+
+                case USER_MESSAGE_NOTIFICATION_DELETE_BY_ID_REQUEST -> {
+                    LOGGER.debug("Processing request to delete a notification by ID");
+                    sendBotMessage(userId, BOT_MESSAGE_NOTIFICATION_ID_INSTRUCTIONS);
+                }
+
+                case USER_MESSAGE_NOTIFICATION_DELETE_BY_ID -> {
+                    LOGGER.debug("Processing notification deletion");
+                    if (StringUtils.isNumeric(currUserMessage)) {
+                        long id = Long.parseLong(currUserMessage.trim());
+                        notificationService.deleteNotification(user, id);
+                        sendBotMessage(userId, BOT_MESSAGE_NOTIFICATION_DELETED);
+                    } else {
+                        LOGGER.warn("Wrong message format");
+                        sendBotMessage(userId, BOT_MESSAGE_NOTIFICATION_WRONG_FORMAT_ID);
+                    }
+                }
+
+                case USER_MESSAGE_NOTIFICATIONS_DELETE_ALL_REQUEST -> {
+                    LOGGER.debug("Processing all notifications deletion");
+                    notificationService.deleteAllNotifications(user);
+                    sendBotMessage(userId, BOT_MESSAGE_NOTIFICATIONS_DELETED);
                 }
 
                 default -> {
@@ -157,8 +181,20 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
             return USER_MESSAGE_NOTIFICATION_ADD_REQUEST;
         }
 
+        if (currMessage.equals(KB_NOTIFICATION_DELETE_BY_ID)) {
+            return USER_MESSAGE_NOTIFICATION_DELETE_BY_ID_REQUEST;
+        }
+
+        if (currMessage.equals(KB_NOTIFICATIONS_DELETE_ALL)) {
+            return USER_MESSAGE_NOTIFICATIONS_DELETE_ALL_REQUEST;
+        }
+
         if (prevMessage.equals(KB_NOTIFICATION_ADD)) {
             return USER_MESSAGE_NOTIFICATION_ADD;
+        }
+
+        if (prevMessage.equals(KB_NOTIFICATION_DELETE_BY_ID)) {
+            return USER_MESSAGE_NOTIFICATION_DELETE_BY_ID;
         }
 
         return USER_MESSAGE_UNDEFINED;
@@ -189,7 +225,7 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
      * @return Message.
      */
     private String convertNotificationToBotMessage(Notification notification) {
-        return "<" + notification.getId() + "> " +
+        return "\\[ID:" + notification.getId() + "] " +
                 notification.getDateTime().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")) + " " +
                 notification.getMessage();
     }
@@ -200,7 +236,7 @@ public class TgNotificationManagerBotUpdatesListener implements UpdatesListener 
     @Scheduled(cron = "0 0/1 * * * *")
     public void checkActualNotifications() {
         notificationService.getActualNotifications().forEach(notification -> {
-            sendBotMessage(notification.getUser().getId(), "Напоминание: " + notification.getMessage());
+            sendBotMessage(notification.getUser().getId(), "Напоминание: *" + notification.getMessage() + "*");
             notificationService.deleteNotification(notification);
         });
     }

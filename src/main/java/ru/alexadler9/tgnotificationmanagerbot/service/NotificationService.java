@@ -89,4 +89,25 @@ public class NotificationService {
         notificationRepository.delete(notification);
         LOGGER.debug("Notification removed: {}", notification);
     }
+
+    /**
+     * Remove a notification from the database.
+     * @param user user.
+     * @param notificationId notification ID.
+     */
+    @Transactional
+    public void deleteNotification(User user, long notificationId) {
+        int removedNumber = notificationRepository.deleteAllByIdUserAndId(user.getId(), notificationId);
+        LOGGER.debug("{} notifications removed for user {}", removedNumber, user.getId());
+    }
+
+    /**
+     * Remove all notifications (for user) from the database.
+     * @param user user.
+     */
+    @Transactional
+    public void deleteAllNotifications(User user) {
+        int removedNumber = notificationRepository.deleteAllByIdUser(user.getId());
+        LOGGER.debug("{} notifications removed for user {}", removedNumber, user.getId());
+    }
 }

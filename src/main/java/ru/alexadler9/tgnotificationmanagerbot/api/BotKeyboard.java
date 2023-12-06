@@ -17,6 +17,12 @@ public class BotKeyboard {
 
         public static final String KB_NOTIFICATIONS_GET =
                 "СПИСОК НАПОМИНАНИЙ";
+
+        public static final String KB_NOTIFICATION_DELETE_BY_ID =
+                "УДАЛИТЬ ПО ID";
+
+        public static final String KB_NOTIFICATIONS_DELETE_ALL =
+                "УДАЛИТЬ ВСЕ";
     }
 
     /**
@@ -28,7 +34,8 @@ public class BotKeyboard {
         return new ReplyKeyboardMarkup
                 (
                     new String[] { Button.KB_NOTIFICATION_ADD },
-                    new String[] { Button.KB_NOTIFICATIONS_GET }
+                    new String[] { Button.KB_NOTIFICATIONS_GET },
+                    new String[] { Button.KB_NOTIFICATION_DELETE_BY_ID, Button.KB_NOTIFICATIONS_DELETE_ALL }
                 )
                 .oneTimeKeyboard(false)
                 .resizeKeyboard(true)

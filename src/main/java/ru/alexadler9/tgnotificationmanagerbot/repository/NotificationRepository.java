@@ -20,4 +20,12 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Modifying
     @Query(value = "DELETE FROM notifications WHERE date_time < :dateTime", nativeQuery = true)
     int deleteAllByDateTimeBefore(LocalDateTime dateTime);
+
+    @Modifying
+    @Query(value = "DELETE FROM notifications WHERE id_user = :userId", nativeQuery = true)
+    int deleteAllByIdUser(Long userId);
+
+    @Modifying
+    @Query(value = "DELETE FROM notifications WHERE id_user = :userId AND id = :id", nativeQuery = true)
+    int deleteAllByIdUserAndId(Long userId, Long id);
 }

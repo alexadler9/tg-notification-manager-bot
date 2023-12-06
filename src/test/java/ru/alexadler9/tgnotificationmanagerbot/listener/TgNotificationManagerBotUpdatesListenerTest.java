@@ -43,7 +43,7 @@ class TgNotificationManagerBotUpdatesListenerTest {
     }
 
     @Test
-    public void shouldReturnNotificationsGetMessage() {
+    public void shouldReturnNotificationsGetRequestMessage() {
         Assertions.assertEquals(USER_MESSAGE_NOTIFICATIONS_GET_REQUEST, out.parseUserMessage(KB_NOTIFICATIONS_GET, ""));
     }
 
@@ -55,6 +55,21 @@ class TgNotificationManagerBotUpdatesListenerTest {
     @Test
     public void shouldReturnNotificationAddMessage() {
         Assertions.assertEquals(USER_MESSAGE_NOTIFICATION_ADD, out.parseUserMessage("01.01.2024 12:00 сделать домашнее задание", KB_NOTIFICATION_ADD));
+    }
+
+    @Test
+    public void shouldReturnNotificationDeleteByIdRequestMessage() {
+        Assertions.assertEquals(USER_MESSAGE_NOTIFICATION_DELETE_BY_ID_REQUEST, out.parseUserMessage(KB_NOTIFICATION_DELETE_BY_ID, ""));
+    }
+
+    @Test
+    public void shouldReturnNotificationDeleteByIdMessage() {
+        Assertions.assertEquals(USER_MESSAGE_NOTIFICATION_DELETE_BY_ID, out.parseUserMessage("25", KB_NOTIFICATION_DELETE_BY_ID));
+    }
+
+    @Test
+    public void shouldReturnNotificationsDeleteAllRequestMessage() {
+        Assertions.assertEquals(USER_MESSAGE_NOTIFICATIONS_DELETE_ALL_REQUEST, out.parseUserMessage(KB_NOTIFICATIONS_DELETE_ALL, ""));
     }
 
     @ParameterizedTest
@@ -79,7 +94,8 @@ class TgNotificationManagerBotUpdatesListenerTest {
         return Stream.of(
                 Arguments.of("", ""),                                           // User message is empty
                 Arguments.of("Invalid message", ""),                            // Invalid format message
-                Arguments.of("01.01.2024 12:00 сделать домашнее задание", "")   // Notification message without a request
+                Arguments.of("01.01.2024 12:00 сделать домашнее задание", ""),  // Notification message without a request
+                Arguments.of("25", "")                                          // Notification ID without a request
         );
     }
 

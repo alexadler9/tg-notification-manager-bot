@@ -18,9 +18,21 @@ public class BotMessage {
     public static final String BOT_MESSAGE_NOTIFICATION_ADDED =
             "Новое напоминание добавлено";
 
+    public static final String BOT_MESSAGE_NOTIFICATION_ID_INSTRUCTIONS =
+            "Введите идентификатор напоминания (ID)";
+
+    public static final String BOT_MESSAGE_NOTIFICATION_DELETED =
+            "Напоминание удалено";
+
+    public static final String BOT_MESSAGE_NOTIFICATIONS_DELETED =
+            "Напоминания удалены";
+
     public static final String BOT_MESSAGE_NOTIFICATION_WRONG_FORMAT =
             "Некорректный формат напоминания";
 
     public static final String BOT_MESSAGE_NOTIFICATION_WRONG_FORMAT_TIME_DATE =
             "Некорректный формат даты и/или времени напоминания";
+
+    public static final String BOT_MESSAGE_NOTIFICATION_WRONG_FORMAT_ID =
+            "Некорректный формат идентификатора напоминания";
 }
